@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
+from typing import List
+
 import numpy as np
+
+from .CriterionName import CriterionName
+from .CriterionValue import CriterionValue
+from .Item import Item
 
 
 class Preferences:
@@ -13,8 +19,8 @@ class Preferences:
 
     def __init__(self):
         """Creates a new Preferences object."""
-        self.__criterion_name_list = []
-        self.__criterion_value_list = []
+        self.__criterion_name_list: List[CriterionName] = []
+        self.__criterion_value_list: List[CriterionValue] = []
 
     def get_criterion_name_list(self):
         """Returns the list of criterion name."""
@@ -50,16 +56,16 @@ class Preferences:
             if criterion_name == criterion_name_2:
                 return False
 
-    def is_preferred_item(self, item_1, item_2):
+    def is_preferred_item(self, item_1: Item, item_2: Item) -> bool:
         """Returns if the item 1 is preferred to the item 2."""
         return item_1.get_score(self) > item_2.get_score(self)
 
-    def most_preferred(self, item_list):
+    def most_preferred(self, item_list) -> Item:
         """Returns the most preferred item from a list."""
         best_item_index = np.argmax(map(lambda item: item.get_score(self), item_list))
         return item_list[best_item_index]
 
-    def is_item_among_top_10_percent(self, item, item_list):
+    def is_item_among_top_10_percent(self, item: Item, item_list: List[Item]) -> bool:
         """
         Return whether a given item is among the top 10 percent of the preferred items.
 
