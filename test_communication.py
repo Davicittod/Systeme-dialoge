@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Testing all the functionalities of the communication package.
 """

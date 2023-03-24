@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 class Message:
     """Message class.
     Class implementing the message object which is exchanged between agents through a message service

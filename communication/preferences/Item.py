@@ -1,7 +1,11 @@
-#!/usr/bin/env python3
-from .CriterionName import CriterionName
-from .Preferences import Preferences
-from .Value import Value
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from communication.preferences.CriterionName import CriterionName
+    from communication.preferences.Preferences import Preferences
+    from communication.preferences.Value import Value
 
 
 class Item:
@@ -30,7 +34,9 @@ class Item:
         """Returns the description of the item."""
         return self.__description
 
-    def get_value(self, preferences: Preferences, criterion_name: CriterionName) -> Value | None:
+    def get_value(
+        self, preferences: Preferences, criterion_name: CriterionName
+    ) -> Value | None:
         """Returns the Value of the Item according to agent preferences."""
         return preferences.get_value(self, criterion_name)
 

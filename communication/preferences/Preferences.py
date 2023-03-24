@@ -1,11 +1,16 @@
-#!/usr/bin/env python3
-from typing import List
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List
+    from communication.preferences.CriterionName import CriterionName
+    from communication.preferences.CriterionValue import CriterionValue
+    from communication.preferences.Value import Value
 
 import numpy as np
 
-from .CriterionName import CriterionName
-from .CriterionValue import CriterionValue
-from .Item import Item
+from communication.preferences.Item import Item
 
 
 class Preferences:
@@ -22,23 +27,23 @@ class Preferences:
         self.__criterion_name_list: List[CriterionName] = []
         self.__criterion_value_list: List[CriterionValue] = []
 
-    def get_criterion_name_list(self):
+    def get_criterion_name_list(self) -> List[CriterionName]:
         """Returns the list of criterion name."""
         return self.__criterion_name_list
 
-    def get_criterion_value_list(self):
+    def get_criterion_value_list(self) -> List[CriterionValue]:
         """Returns the list of criterion value."""
         return self.__criterion_value_list
 
-    def set_criterion_name_list(self, criterion_name_list):
+    def set_criterion_name_list(self, criterion_name_list: List[CriterionName]):
         """Sets the list of criterion name."""
         self.__criterion_name_list = criterion_name_list
 
-    def add_criterion_value(self, criterion_value):
+    def add_criterion_value(self, criterion_value: CriterionValue):
         """Adds a criterion value in the list."""
         self.__criterion_value_list.append(criterion_value)
 
-    def get_value(self, item, criterion_name):
+    def get_value(self, item: Item, criterion_name: CriterionName) -> Value | None:
         """Gets the value for a given item and a given criterion name."""
         for value in self.__criterion_value_list:
             if (
@@ -48,7 +53,9 @@ class Preferences:
                 return value.get_value()
         return None
 
-    def is_preferred_criterion(self, criterion_name_1, criterion_name_2):
+    def is_preferred_criterion(
+        self, criterion_name_1: CriterionName, criterion_name_2: CriterionName
+    ) -> bool:
         """Returns if a criterion 1 is preferred to the criterion 2."""
         for criterion_name in self.__criterion_name_list:
             if criterion_name == criterion_name_1:
@@ -60,7 +67,7 @@ class Preferences:
         """Returns if the item 1 is preferred to the item 2."""
         return item_1.get_score(self) > item_2.get_score(self)
 
-    def most_preferred(self, item_list) -> Item:
+    def most_preferred(self, item_list: List[Item]) -> Item:
         """Returns the most preferred item from a list."""
         best_item_index = np.argmax(map(lambda item: item.get_score(self), item_list))
         return item_list[best_item_index]

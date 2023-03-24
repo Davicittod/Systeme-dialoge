@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 class Mailbox:
     """Mailbox class.
     Class implementing the mailbox object which manages messages in communicating agents.

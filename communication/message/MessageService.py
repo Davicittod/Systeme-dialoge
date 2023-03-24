@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 class MessageService:
     """MessageService class.
     Class implementing the message service used to dispatch messages between communicating agents.
