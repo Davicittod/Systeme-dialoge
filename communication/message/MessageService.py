@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from communication.message.Message import Message
 
 
 class MessageService:
@@ -29,18 +30,18 @@ class MessageService:
             self.__instant_delivery = instant_delivery
             self.__messages_to_proceed = []
 
-    def set_instant_delivery(self, instant_delivery):
+    def set_instant_delivery(self, instant_delivery: bool):
         """Set the instant delivery parameter."""
         self.__instant_delivery = instant_delivery
 
-    def send_message(self, message):
+    def send_message(self, message: Message):
         """Dispatch message if instant delivery active, otherwise add the message to proceed list."""
         if self.__instant_delivery:
             self.dispatch_message(message)
         else:
             self.__messages_to_proceed.append(message)
 
-    def dispatch_message(self, message):
+    def dispatch_message(self, message: Message):
         """Dispatch the message to the right agent."""
         self.find_agent_from_name(message.get_dest()).receive_message(message)
 
@@ -52,7 +53,7 @@ class MessageService:
 
         self.__messages_to_proceed.clear()
 
-    def find_agent_from_name(self, agent_name):
+    def find_agent_from_name(self, agent_name: str):
         """Return the agent according to the agent name given."""
         for agent in self.__scheduler.agents:
             if agent.get_name() == agent_name:
