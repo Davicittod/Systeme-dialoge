@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-from mesa import Agent
+from mesa import Agent, Model
 
 from communication.mailbox.Mailbox import Mailbox
+from communication.message.Message import Message
+from communication.message.MessagePerformative import MessagePerformative
 from communication.message.MessageService import MessageService
 
 
@@ -19,26 +21,26 @@ class CommunicatingAgent(Agent):
         message_service: The message service used to send and receive message (MessageService)
     """
 
-    def __init__(self, unique_id, model, name):
+    def __init__(self, unique_id: int, model: Model, name: str):
         """Create a new communicating agent."""
         super().__init__(unique_id, model)
         self.__name = name
-        self.__mailbox = Mailbox()
-        self.__messages_service = MessageService.get_instance()
+        self.__mailbox: Mailbox = Mailbox()
+        self.__messages_service: MessageService = MessageService.get_instance()
 
     def step(self):
         """The step methods of the agent called by the scheduler at each time tick."""
         super().step()
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Return the name of the communicating agent."""
         return self.__name
 
-    def receive_message(self, message):
+    def receive_message(self, message: Message):
         """Receive a message (called by the MessageService object) and store it in the mailbox."""
         self.__mailbox.receive_messages(message)
 
-    def send_message(self, message):
+    def send_message(self, message: Message):
         """Send message through the MessageService object."""
         self.__messages_service.send_message(message)
 
@@ -50,7 +52,7 @@ class CommunicatingAgent(Agent):
         """Return all the received messages."""
         return self.__mailbox.get_messages()
 
-    def get_messages_from_performative(self, performative):
+    def get_messages_from_performative(self, performative: MessagePerformative):
         """Return a list of messages which have the same performative."""
         return self.__mailbox.get_messages_from_performative(performative)
 
