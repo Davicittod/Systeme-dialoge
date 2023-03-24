@@ -1,4 +1,11 @@
-#!/usr/bin/env python3
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from communication.preferences.CriterionName import CriterionName
+    from communication.preferences.Preferences import Preferences
+    from communication.preferences.Value import Value
 
 
 class Item:
@@ -10,7 +17,7 @@ class Item:
         description: the description of the item
     """
 
-    def __init__(self, name, description):
+    def __init__(self, name: str, description: str):
         """Creates a new Item."""
         self.__name = name
         self.__description = description
@@ -19,19 +26,21 @@ class Item:
         """Returns Item as a String."""
         return self.__name + " (" + self.__description + ")"
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Returns the name of the item."""
         return self.__name
 
-    def get_description(self):
+    def get_description(self) -> str:
         """Returns the description of the item."""
         return self.__description
 
-    def get_value(self, preferences, criterion_name):
+    def get_value(
+        self, preferences: Preferences, criterion_name: CriterionName
+    ) -> Value | None:
         """Returns the Value of the Item according to agent preferences."""
         return preferences.get_value(self, criterion_name)
 
-    def get_score(self, preferences):
+    def get_score(self, preferences: Preferences) -> float:
         """Returns the score of the Item according to agent preferences."""
         criterion_weight = 100
         sum_result = 0

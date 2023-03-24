@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 from mailbox import Message
 from typing import List
 

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from mesa import Agent, Model
 
 from communication.mailbox.Mailbox import Mailbox
