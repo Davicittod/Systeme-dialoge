@@ -1,0 +1,66 @@
+{
+  "agents": [
+    {
+      "name": "A1",
+      "performance": {
+        "ICED": {
+          "PRODUCTION_COST": "VERY_GOOD",
+          "CONSUMPTION": "GOOD",
+          "DURABILITY": "VERY_GOOD",
+          "ENVIRONMENT_IMPACT": "BAD",
+          "NOISE": "AVERAGE"
+        },
+        "E": {
+          "PRODUCTION_COST": "AVERAGE",
+          "CONSUMPTION": "BAD",
+          "DURABILITY": "GOOD",
+          "ENVIRONMENT_IMPACT": "VERY_GOOD",
+          "NOISE": "VERY_GOOD"
+        }
+      },
+      "preferences": [
+        "PRODUCTION_COST",
+        "ENVIRONMENT_IMPACT",
+        "CONSUMPTION",
+        "DURABILITY",
+        "NOISE"
+      ]
+    },
+    {
+      "name": "A2",
+      "performance": {
+        "ICED": {
+          "PRODUCTION_COST": "GOOD",
+          "CONSUMPTION": "AVERAGE",
+          "DURABILITY": "GOOD",
+          "ENVIRONMENT_IMPACT": "BAD",
+          "NOISE": "BAD"
+        },
+        "E": {
+          "PRODUCTION_COST": "GOOD",
+          "CONSUMPTION": "AVERAGE",
+          "DURABILITY": "AVERAGE",
+          "ENVIRONMENT_IMPACT": "VERY_GOOD",
+          "NOISE": "VERY_GOOD"
+        }
+      },
+      "preferences": [
+        "ENVIRONMENT_IMPACT",
+        "NOISE",
+        "PRODUCTION_COST",
+        "CONSUMPTION",
+        "DURABILITY"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "name": "ICED",
+      "description": "ICED description"
+    },
+    {
+      "name": "E",
+      "description": "E description"
+    }
+  ]
+}
