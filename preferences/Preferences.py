@@ -4,13 +4,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import List
-    from communication.preferences.CriterionName import CriterionName
-    from communication.preferences.CriterionValue import CriterionValue
-    from communication.preferences.Value import Value
+    from preferences.CriterionName import CriterionName
+    from preferences.CriterionValue import CriterionValue
+    from preferences.Value import Value
 
 import numpy as np
 
-from communication.preferences.Item import Item
+from preferences.Item import Item
 
 
 class Preferences:

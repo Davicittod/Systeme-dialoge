@@ -1,6 +1,6 @@
-from communication.preferences.CriterionName import CriterionName
-from communication.preferences.Item import Item
-from communication.preferences.Value import Value
+from preferences.CriterionName import CriterionName
+from preferences.Item import Item
+from preferences.Value import Value
 
 
 class CriterionValue:

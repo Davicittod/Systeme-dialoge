@@ -1,8 +1,8 @@
-from communication.preferences.CriterionName import CriterionName
-from communication.preferences.CriterionValue import CriterionValue
-from communication.preferences.Item import Item
-from communication.preferences.Preferences import Preferences
-from communication.preferences.Value import Value
+from preferences.CriterionName import CriterionName
+from preferences.CriterionValue import CriterionValue
+from preferences.Item import Item
+from preferences.Preferences import Preferences
+from preferences.Value import Value
 
 if __name__ == "__main__":
     """Testing the Preferences class."""
