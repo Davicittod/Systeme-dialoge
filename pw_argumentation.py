@@ -1,5 +1,5 @@
 import random
-from typing import List, Self
+from typing import List
 
 from mesa import Model
 from mesa.time import RandomActivation
