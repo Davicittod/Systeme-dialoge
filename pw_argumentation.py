@@ -113,11 +113,6 @@ class ArgumentAgent(CommunicatingAgent):
     def get_preference(self) -> Preferences:
         return self.__preference
 
-    def generate_preferences(self, item_list: List[Item]):
-        # see question 3
-        # To be completed
-        pass
-
 
 class ArgumentModel(Model):
     """ArgumentModel which inherit from Model ."""
