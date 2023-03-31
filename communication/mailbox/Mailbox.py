@@ -1,5 +1,6 @@
-from mailbox import Message
 from typing import List
+
+from communication.message.Message import Message
 
 
 class Mailbox:
