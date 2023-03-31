@@ -19,7 +19,7 @@ class MessageService:
         """Static access method."""
         return MessageService.__instance
 
-    def __init__(self, scheduler, instant_delivery=True):
+    def __init__(self, scheduler, instant_delivery: bool =True):
         """Create a new MessageService object."""
         if MessageService.__instance is not None:
             raise Exception("This class is a singleton!")
