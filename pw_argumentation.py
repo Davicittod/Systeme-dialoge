@@ -8,6 +8,7 @@ from communication.agent.CommunicatingAgent import CommunicatingAgent
 from communication.message.Message import Message
 from communication.message.MessagePerformative import MessagePerformative
 from communication.message.MessageService import MessageService
+from loader import load_json
 from preferences.Item import Item
 from preferences.Preferences import Preferences
 
@@ -16,50 +17,50 @@ class ArgumentAgent(CommunicatingAgent):
     """ArgumentAgent which inherit from CommunicatingAgent ."""
 
     def __init__(
-        self, 
-        unique_id: int, 
-        model: Model, 
-        name: str, 
+        self,
+        unique_id: int,
+        model: Model,
+        name: str,
         preferences: Preferences,
-        item_list: List[Item], 
-        other_agent: Self = None,
-        start_propose: bool=False, 
+        item_list: List[Item],
+        agent_to_propose: str | None = None,
     ):
-        super().__init__(unique_id, model, name, preferences)
-        self.preference: Preferences = preferences
-        self.start_propose = start_propose
-        self.item_list = item_list
-        self.other_agent = other_agent
-        self.has_proposed = False
+        super().__init__(unique_id, model, name)
+        self.__preference: Preferences = preferences
+        self.__item_list = item_list
+        self.__agent_to_propose = agent_to_propose
 
     def step(self):
         super().step()
-        if self.start_propose:
-            message = Message(self.get_name(), 
-                              self.other_agent.get_name(), 
-                              MessagePerformative.PROPOSE, 
-                              random.choice(self.item_list))
-            self.send_message(Message)
+        if self.__agent_to_propose != None:
+            message = Message(
+                self.get_name(),
+                self.__agent_to_propose,
+                MessagePerformative.PROPOSE,
+                random.choice(self.__item_list),
+            )
+            self.send_message(message)
             print(message)
-            self.start_propose = False
+            self.__agent_to_propose = None
 
         messages = self.get_new_messages()
         for message in messages:
             match message.get_performative():
                 case MessagePerformative.PROPOSE:
-                    self.other_agent = message.get_exp()
-                    item = message[0].get_content()
-                    message = Message(self.get_name(), 
-                                        self.other_agent.get_name(), 
-                                        MessagePerformative.ACCEPT, 
-                                        item)
+                    item = message.get_content()
+                    message = Message(
+                        self.get_name(),
+                        message.get_exp(),
+                        MessagePerformative.ACCEPT,
+                        item,
+                    )
                     self.send_message(message)
-                    print(Message)
+                    print(message)
                 case _:
-                    print("Message not supported")
+                    print("Message not supported:", message)
 
     def get_preference(self) -> Preferences:
-        return self.preference
+        return self.__preference
 
     def generate_preferences(self, item_list: List[Item]):
         # see question 3
@@ -70,15 +71,22 @@ class ArgumentAgent(CommunicatingAgent):
 class ArgumentModel(Model):
     """ArgumentModel which inherit from Model ."""
 
-    def __init__(self):
+    def __init__(self, path: str):
+        super().__init__()
         self.schedule = RandomActivation(self)
         self.__messages_service = MessageService(self.schedule)
-        # To be completed
-        #
-        # a = ArgumentAgent ( id , " agent_name ")
-        # a . generate_preferences ( preferences )
-        # self . schedule . add ( a )
-        # ...
+
+        (items, agents_data) = load_json(path)
+
+        for index, agent_data in enumerate(agents_data):
+            other_agent = None
+            if index == 0:
+                other_agent = random.choice(agents_data[1:])[0]
+            agent = ArgumentAgent(
+                self.next_id(), self, agent_data[0], agent_data[1], items, other_agent
+            )
+            self.schedule.add(agent)
+
         self.running = True
 
     def step(self):
@@ -87,5 +95,8 @@ class ArgumentModel(Model):
 
 
 if __name__ == "__main__":
-    argument_model = ArgumentModel()
-# To be completed
+    NUMBER_OF_STEPS = 10
+
+    argument_model = ArgumentModel("./environment.json")
+    for i in range(NUMBER_OF_STEPS):
+        argument_model.step()
