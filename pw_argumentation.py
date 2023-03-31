@@ -1,9 +1,12 @@
+import random
 from typing import List
 
 from mesa import Model
 from mesa.time import RandomActivation
 
 from communication.agent.CommunicatingAgent import CommunicatingAgent
+from communication.message.Message import Message
+from communication.message.MessagePerformative import MessagePerformative
 from communication.message.MessageService import MessageService
 from loader import load_json
 from preferences.Item import Item
@@ -14,13 +17,47 @@ class ArgumentAgent(CommunicatingAgent):
     """ArgumentAgent which inherit from CommunicatingAgent ."""
 
     def __init__(
-        self, unique_id: int, model: Model, name: str, preferences: Preferences
+        self,
+        unique_id: int,
+        model: Model,
+        name: str,
+        preferences: Preferences,
+        item_list: List[Item],
+        agent_to_propose: str | None = None,
     ):
         super().__init__(unique_id, model, name)
         self.__preference: Preferences = preferences
+        self.__item_list = item_list
+        self.__agent_to_propose = agent_to_propose
 
     def step(self):
         super().step()
+        if self.__agent_to_propose != None:
+            message = Message(
+                self.get_name(),
+                self.__agent_to_propose,
+                MessagePerformative.PROPOSE,
+                random.choice(self.__item_list),
+            )
+            self.send_message(message)
+            print(message)
+            self.__agent_to_propose = None
+
+        messages = self.get_new_messages()
+        for message in messages:
+            match message.get_performative():
+                case MessagePerformative.PROPOSE:
+                    item = message.get_content()
+                    message = Message(
+                        self.get_name(),
+                        message.get_exp(),
+                        MessagePerformative.ACCEPT,
+                        item,
+                    )
+                    self.send_message(message)
+                    print(message)
+                case _:
+                    print("Message not supported:", message)
 
     def get_preference(self) -> Preferences:
         return self.__preference
@@ -41,8 +78,13 @@ class ArgumentModel(Model):
 
         (items, agents_data) = load_json(path)
 
-        for agent_data in agents_data:
-            agent = ArgumentAgent(self.next_id(), self, agent_data[0], agent_data[1])
+        for index, agent_data in enumerate(agents_data):
+            other_agent = None
+            if index == 0:
+                other_agent = random.choice(agents_data[1:])[0]
+            agent = ArgumentAgent(
+                self.next_id(), self, agent_data[0], agent_data[1], items, other_agent
+            )
             self.schedule.add(agent)
 
         self.running = True
