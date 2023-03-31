@@ -36,6 +36,7 @@ class ArgumentAgent(CommunicatingAgent):
 
     def step(self):
         super().step()
+
         if self.__agent_to_propose != None:
             self.send_message(
                 Message(
@@ -49,9 +50,9 @@ class ArgumentAgent(CommunicatingAgent):
 
         messages = self.get_new_messages()
         for message in messages:
+            item: Item = message.get_content()
             match message.get_performative():
                 case MessagePerformative.PROPOSE:
-                    item: Item = message.get_content()
                     # We check wether is of the 10% preferred item
                     if self.__preference.is_item_among_top_10_percent(
                         item, self.__item_list
@@ -73,6 +74,39 @@ class ArgumentAgent(CommunicatingAgent):
                                 item,
                             )
                         )
+                case MessagePerformative.ACCEPT:
+                    self.send_message(
+                        Message(
+                            self.get_name(),
+                            message.get_exp(),
+                            MessagePerformative.COMMIT,
+                            item,
+                        )
+                    )
+                    self.__item_list.remove(item)
+
+                case MessagePerformative.COMMIT:
+                    if item in self.__item_list:
+                        self.send_message(
+                            Message(
+                                self.get_name(),
+                                message.get_exp(),
+                                MessagePerformative.COMMIT,
+                                item,
+                            )
+                        )
+                        self.__item_list.remove(item)
+
+                case MessagePerformative.ASK_WHY:
+                    self.send_message(
+                        Message(
+                            self.get_name(),
+                            message.get_exp(),
+                            MessagePerformative.ARGUE,
+                            item,
+                        )
+                    )
+
                 case _:
                     print("Message not supported:", message)
 
@@ -100,7 +134,12 @@ class ArgumentModel(Model):
             if index == 0:
                 other_agent = random.choice(agents_data[1:])[0]
             agent = ArgumentAgent(
-                self.next_id(), self, agent_data[0], agent_data[1], items, other_agent
+                self.next_id(),
+                self,
+                agent_data[0],
+                agent_data[1],
+                items.copy(),
+                other_agent,
             )
             self.schedule.add(agent)
 
