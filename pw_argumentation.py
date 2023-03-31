@@ -30,17 +30,21 @@ class ArgumentAgent(CommunicatingAgent):
         self.__item_list = item_list
         self.__agent_to_propose = agent_to_propose
 
+    def send_message(self, message: Message):
+        print(message)
+        return super().send_message(message)
+
     def step(self):
         super().step()
         if self.__agent_to_propose != None:
-            message = Message(
-                self.get_name(),
-                self.__agent_to_propose,
-                MessagePerformative.PROPOSE,
-                random.choice(self.__item_list),
+            self.send_message(
+                Message(
+                    self.get_name(),
+                    self.__agent_to_propose,
+                    MessagePerformative.PROPOSE,
+                    random.choice(self.__item_list),
+                )
             )
-            self.send_message(message)
-            print(message)
             self.__agent_to_propose = None
 
         messages = self.get_new_messages()
@@ -48,14 +52,14 @@ class ArgumentAgent(CommunicatingAgent):
             match message.get_performative():
                 case MessagePerformative.PROPOSE:
                     item = message.get_content()
-                    message = Message(
-                        self.get_name(),
-                        message.get_exp(),
-                        MessagePerformative.ACCEPT,
-                        item,
+                    self.send_message(
+                        Message(
+                            self.get_name(),
+                            message.get_exp(),
+                            MessagePerformative.ACCEPT,
+                            item,
+                        )
                     )
-                    self.send_message(message)
-                    print(message)
                 case _:
                     print("Message not supported:", message)
 
