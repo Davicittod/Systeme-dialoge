@@ -48,14 +48,23 @@ class ArgumentAgent(CommunicatingAgent):
             match message.get_performative():
                 case MessagePerformative.PROPOSE:
                     item = message.get_content()
-                    message = Message(
-                        self.get_name(),
-                        message.get_exp(),
-                        MessagePerformative.ACCEPT,
-                        item,
-                    )
-                    self.send_message(message)
-                    print(message)
+                    # We check wether is of the 10% preferred item
+                    if self.__preference.is_item_among_top_10_percent(item):
+                        message = Message(
+                            self.get_name(),
+                            message.get_exp(),
+                            MessagePerformative.ACCEPT,
+                            item,
+                        )
+                        self.send_message(message)
+                        print(message)
+                    else:
+                        message = Message(
+                            self.get_name(),
+                            message.get_exp(),
+                            MessagePerformative.ASK_WHY,
+                            item,
+                        )
                 case _:
                     print("Message not supported:", message)
 
