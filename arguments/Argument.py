@@ -42,3 +42,6 @@ class Argument:
         couple_values = ", ".join(map(str, self.couple_values_list))
         comparaisons = ", ".join(map(str, self.comparison_list))
         return f"{neg} {self.item.get_name()} <= {couple_values}, {comparaisons}"
+
+    def __repr__(self) -> str:
+        return str(self)

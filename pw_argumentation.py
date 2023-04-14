@@ -4,6 +4,7 @@ from typing import List
 from mesa import Model
 from mesa.time import RandomActivation
 
+from arguments.CoupleValue import CoupleValue
 from communication.agent.CommunicatingAgent import CommunicatingAgent
 from communication.message.Message import Message
 from communication.message.MessagePerformative import MessagePerformative
@@ -11,6 +12,7 @@ from communication.message.MessageService import MessageService
 from loader import load_json
 from preferences.Item import Item
 from preferences.Preferences import Preferences
+from preferences.Value import Value
 
 
 class ArgumentAgent(CommunicatingAgent):
@@ -112,6 +114,22 @@ class ArgumentAgent(CommunicatingAgent):
 
     def get_preference(self) -> Preferences:
         return self.__preference
+
+    def list_supporting_proposal(self, item: Item) -> List[CoupleValue]:
+        result = []
+        for criterion in self.get_preference().get_criterion_name_list():
+            value = self.get_preference().get_value(item, criterion)
+            if value == Value.GOOD or value == Value.VERY_GOOD:
+                result.append(CoupleValue(criterion, value))
+        return result
+
+    def list_attacking_proposal(self, item: Item) -> List[CoupleValue]:
+        result = []
+        for criterion in self.get_preference().get_criterion_name_list():
+            value = self.get_preference().get_value(item, criterion)
+            if value == Value.BAD or value == Value.VERY_BAD:
+                result.append(CoupleValue(criterion, value))
+        return result
 
 
 class ArgumentModel(Model):

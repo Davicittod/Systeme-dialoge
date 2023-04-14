@@ -18,3 +18,6 @@ class CoupleValue:
 
     def __str__(self) -> str:
         return f"{self.criterion_name.name} = {self.value.name}"
+
+    def __repr__(self) -> str:
+        return str(self)

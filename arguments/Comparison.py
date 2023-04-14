@@ -19,3 +19,6 @@ class Comparison:
 
     def __str__(self):
         return f"{self.best_criterion_name.name} > {self.worst_criterion_name.name}"
+
+    def __repr__(self) -> str:
+        return str(self)
