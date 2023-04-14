@@ -22,26 +22,28 @@ class Argument:
         """Creates a new Argument ."""
         self.boolean_decision = boolean_decision
         self.item = item
-        self.comparison_list: List[Comparison] = []
-        self.couple_values_list: List[CoupleValue] = []
+        self.comparison: Comparison = None
+        self.couple_value: CoupleValue = None
 
-    def add_premiss_comparison(
+    def set_premiss_comparison(
         self, best_criterion_name: CriterionName, worst_criterion_name: CriterionName
     ):
         """Adds a premiss comparison in the comparison list ."""
-        self.comparison_list.append(
-            Comparison(best_criterion_name, worst_criterion_name)
-        )
+        self.comparison = Comparison(best_criterion_name, worst_criterion_name)
 
-    def add_premiss_couple_values(self, criterion_name: CriterionName, value: Value):
+    def set_premiss_couple_value(self, criterion_name: CriterionName, value: Value):
         """Add a premiss couple values in the couple values list ."""
-        self.couple_values_list.append(CoupleValue(criterion_name, value))
+        self.couple_value = CoupleValue(criterion_name, value)
 
     def __str__(self) -> str:
-        neg = "" if self.boolean_decision else "not"
-        couple_values = ", ".join(map(str, self.couple_values_list))
-        comparaisons = ", ".join(map(str, self.comparison_list))
-        return f"{neg} {self.item.get_name()} <= {couple_values}, {comparaisons}"
+        neg = "" if self.boolean_decision else "not "
+
+        premises = [self.couple_value]
+        if self.comparison != None:
+            premises.append(self.comparison)
+        premises = ", ".join(map(str, premises))
+
+        return f"{neg}{self.item.get_name()} <= {premises}"
 
     def __repr__(self) -> str:
         return str(self)

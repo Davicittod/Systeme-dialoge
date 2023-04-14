@@ -1,5 +1,5 @@
 import random
-from typing import List
+from typing import List, Tuple
 
 from mesa import Model
 from mesa.time import RandomActivation
@@ -53,9 +53,9 @@ class ArgumentAgent(CommunicatingAgent):
 
         messages = self.get_new_messages()
         for message in messages:
-            item: Item = message.get_content()
             match message.get_performative():
                 case MessagePerformative.PROPOSE:
+                    item: Item = message.get_content()
                     # We check wether is of the 10% preferred item
                     if self.__preference.is_item_among_top_10_percent(
                         item, self.__item_list
@@ -78,6 +78,7 @@ class ArgumentAgent(CommunicatingAgent):
                             )
                         )
                 case MessagePerformative.ACCEPT:
+                    item: Item = message.get_content()
                     self.send_message(
                         Message(
                             self.get_name(),
@@ -89,6 +90,7 @@ class ArgumentAgent(CommunicatingAgent):
                     self.__item_list.remove(item)
 
                 case MessagePerformative.COMMIT:
+                    item: Item = message.get_content()
                     if item in self.__item_list:
                         self.send_message(
                             Message(
@@ -101,12 +103,26 @@ class ArgumentAgent(CommunicatingAgent):
                         self.__item_list.remove(item)
 
                 case MessagePerformative.ASK_WHY:
+                    item: Item = message.get_content()
                     self.send_message(
                         Message(
                             self.get_name(),
                             message.get_exp(),
                             MessagePerformative.ARGUE,
                             (item, self.support_proposal(item)),
+                        )
+                    )
+
+                case MessagePerformative.ARGUE:
+                    message_content: Tuple[Item, Argument] = message.get_content()
+                    item, argument = message_content
+                    counter_argument = self.attack_argument(argument)
+                    self.send_message(
+                        Message(
+                            self.get_name(),
+                            message.get_exp(),
+                            MessagePerformative.ARGUE,
+                            (item, counter_argument),
                         )
                     )
 
@@ -135,8 +151,23 @@ class ArgumentAgent(CommunicatingAgent):
     def support_proposal(self, item: Item) -> Argument:
         argument = Argument(True, item)
         premise: CoupleValue = self.list_supporting_proposal(item)[0]
-        argument.add_premiss_couple_values(premise.criterion_name, premise.value)
+        argument.set_premiss_couple_value(premise.criterion_name, premise.value)
         return argument
+
+    def attack_argument(self, argument: Argument) -> Argument | None:
+        argument_criterion = argument.couple_value.criterion_name
+        argument_value = argument.couple_value.value
+        argument_item = argument.item
+        argument_boolean_decision = argument.boolean_decision
+
+        value = self.get_preference().get_value(argument_item, argument_criterion)
+
+        if value == Value.BAD or value == Value.VERY_BAD:
+            argument = Argument(not argument_boolean_decision, argument_item)
+            argument.set_premiss_couple_value(argument_criterion, value)
+            return argument
+
+        pass
 
 
 class ArgumentModel(Model):

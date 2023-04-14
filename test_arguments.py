@@ -16,8 +16,12 @@ if __name__ == "__main__":
     print(couple_value)
 
     argument = Argument(False, Item("Item", "Description"))
-    argument.add_premiss_comparison(CriterionName.CONSUMPTION, CriterionName.DURABILITY)
-    argument.add_premiss_couple_values(CriterionName.CONSUMPTION, Value.BAD)
+    argument.set_premiss_couple_value(CriterionName.CONSUMPTION, Value.BAD)
+    argument.set_premiss_comparison(CriterionName.CONSUMPTION, CriterionName.DURABILITY)
+    print(argument)
+
+    argument = Argument(True, Item("Item", "Description"))
+    argument.set_premiss_couple_value(CriterionName.CONSUMPTION, Value.BAD)
     print(argument)
 
     item = Item("item", "desc")
@@ -28,6 +32,7 @@ if __name__ == "__main__":
             CriterionName.NOISE,
             CriterionName.CONSUMPTION,
             CriterionName.DURABILITY,
+            CriterionName.PRODUCTION_COST,
         ]
     )
     preferences.add_criterion_value(
