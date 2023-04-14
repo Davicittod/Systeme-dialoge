@@ -4,6 +4,7 @@ from typing import List
 from mesa import Model
 from mesa.time import RandomActivation
 
+from arguments.Argument import Argument
 from arguments.CoupleValue import CoupleValue
 from communication.agent.CommunicatingAgent import CommunicatingAgent
 from communication.message.Message import Message
@@ -105,7 +106,7 @@ class ArgumentAgent(CommunicatingAgent):
                             self.get_name(),
                             message.get_exp(),
                             MessagePerformative.ARGUE,
-                            item,
+                            (item, self.support_proposal(item)),
                         )
                     )
 
@@ -130,6 +131,12 @@ class ArgumentAgent(CommunicatingAgent):
             if value == Value.BAD or value == Value.VERY_BAD:
                 result.append(CoupleValue(criterion, value))
         return result
+
+    def support_proposal(self, item: Item) -> Argument:
+        argument = Argument(True, item)
+        premise: CoupleValue = self.list_supporting_proposal(item)[0]
+        argument.add_premiss_couple_values(premise.criterion_name, premise.value)
+        return argument
 
 
 class ArgumentModel(Model):

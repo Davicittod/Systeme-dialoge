@@ -26,6 +26,10 @@ class Item:
         """Returns Item as a String."""
         return self.__name + " (" + self.__description + ")"
 
+    def __repr__(self):
+        """Returns Item as a String."""
+        return self.__name
+
     def get_name(self) -> str:
         """Returns the name of the item."""
         return self.__name
