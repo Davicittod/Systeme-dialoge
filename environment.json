@@ -5,51 +5,66 @@
       "performance": {
         "ICED": {
           "PRODUCTION_COST": "VERY_GOOD",
-          "CONSUMPTION": "GOOD",
+          "CONSUMPTION": "VERY_GOOD",
           "DURABILITY": "VERY_GOOD",
-          "ENVIRONMENT_IMPACT": "BAD",
+          "ENVIRONMENT_IMPACT": "AVERAGE",
           "NOISE": "AVERAGE"
         },
         "E": {
-          "PRODUCTION_COST": "AVERAGE",
-          "CONSUMPTION": "BAD",
+          "PRODUCTION_COST": "GOOD",
+          "CONSUMPTION": "GOOD",
           "DURABILITY": "GOOD",
           "ENVIRONMENT_IMPACT": "VERY_GOOD",
           "NOISE": "VERY_GOOD"
+        },
+        "CNG": {
+          "PRODUCTION_COST": "BAD",
+          "CONSUMPTION": "VERY_BAD",
+          "DURABILITY": "AVERAGE",
+          "ENVIRONMENT_IMPACT": "VERY_BAD",
+          "NOISE": "BAD"
         }
       },
+
       "preferences": [
-        "PRODUCTION_COST",
-        "ENVIRONMENT_IMPACT",
         "CONSUMPTION",
+        "ENVIRONMENT_IMPACT",
         "DURABILITY",
-        "NOISE"
+        "NOISE",
+        "PRODUCTION_COST"
       ]
     },
     {
       "name": "A2",
       "performance": {
         "ICED": {
-          "PRODUCTION_COST": "GOOD",
-          "CONSUMPTION": "AVERAGE",
+          "PRODUCTION_COST": "VERY_GOOD",
+          "CONSUMPTION": "VERY_GOOD",
           "DURABILITY": "GOOD",
           "ENVIRONMENT_IMPACT": "BAD",
           "NOISE": "BAD"
         },
         "E": {
-          "PRODUCTION_COST": "GOOD",
+          "PRODUCTION_COST": "VERY_BAD",
           "CONSUMPTION": "AVERAGE",
           "DURABILITY": "AVERAGE",
-          "ENVIRONMENT_IMPACT": "VERY_GOOD",
-          "NOISE": "VERY_GOOD"
+          "ENVIRONMENT_IMPACT": "GOOD",
+          "NOISE": "GOOD"
+        },
+        "CNG": {
+          "PRODUCTION_COST": "VERY_GOOD",
+          "CONSUMPTION": "VERY_GOOD",
+          "DURABILITY": "GOOD",
+          "ENVIRONMENT_IMPACT": "VERY_BAD",
+          "NOISE": "BAD"
         }
       },
       "preferences": [
-        "ENVIRONMENT_IMPACT",
-        "NOISE",
         "PRODUCTION_COST",
         "CONSUMPTION",
-        "DURABILITY"
+        "DURABILITY",
+        "ENVIRONMENT_IMPACT",
+        "NOISE"
       ]
     }
   ],
@@ -61,6 +76,10 @@
     {
       "name": "E",
       "description": "E description"
+    },
+    {
+      "name": "CNG",
+      "description": "CNG description"
     }
   ]
 }

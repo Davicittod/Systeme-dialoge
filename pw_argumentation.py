@@ -26,12 +26,12 @@ class ArgumentAgent(CommunicatingAgent):
         name: str,
         preferences: Preferences,
         item_list: List[Item],
-        agent_to_propose: str | None = None,
+        agent_to_propose_to: str | None = None,
     ):
         super().__init__(unique_id, model, name)
         self.__preference: Preferences = preferences
         self.__item_list = item_list
-        self.__agent_to_propose = agent_to_propose
+        self.__agent_to_propose_to = agent_to_propose_to
 
     def send_message(self, message: Message):
         print(message)
@@ -40,16 +40,26 @@ class ArgumentAgent(CommunicatingAgent):
     def step(self):
         super().step()
 
-        if self.__agent_to_propose != None:
+        if self.__agent_to_propose_to != None:
+            # Propose an item that is acceptable to the agent
+            item_choices = list(
+                filter(
+                    lambda item: self.get_preference().is_item_among_top_10_percent(
+                        item, self.__item_list
+                    ),
+                    self.__item_list,
+                )
+            )
+            print(item_choices)
             self.send_message(
                 Message(
                     self.get_name(),
-                    self.__agent_to_propose,
+                    self.__agent_to_propose_to,
                     MessagePerformative.PROPOSE,
-                    random.choice(self.__item_list),
+                    random.choice(item_choices),
                 )
             )
-            self.__agent_to_propose = None
+            self.__agent_to_propose_to = None
 
         messages = self.get_new_messages()
         for message in messages:
@@ -57,7 +67,7 @@ class ArgumentAgent(CommunicatingAgent):
                 case MessagePerformative.PROPOSE:
                     item: Item = message.get_content()
                     # We check wether is of the 10% preferred item
-                    if self.__preference.is_item_among_top_10_percent(
+                    if self.get_preference().is_item_among_top_10_percent(
                         item, self.__item_list
                     ):
                         self.send_message(
@@ -113,18 +123,75 @@ class ArgumentAgent(CommunicatingAgent):
                         )
                     )
 
+                case MessagePerformative.CANCEL:
+                    pass
+
                 case MessagePerformative.ARGUE:
                     message_content: Tuple[Item, Argument] = message.get_content()
                     item, argument = message_content
-                    counter_argument = self.attack_argument(argument)
-                    self.send_message(
-                        Message(
-                            self.get_name(),
-                            message.get_exp(),
-                            MessagePerformative.ARGUE,
-                            (item, counter_argument),
+
+                    # If the argument is positive toward the item
+                    if argument.boolean_decision:
+                        # Check if the item is acceptable
+                        if self.get_preference().is_item_among_top_10_percent(
+                            item, self.__item_list
+                        ):
+                            # Accept the item
+                            self.send_message(
+                                Message(
+                                    self.get_name(),
+                                    message.get_exp(),
+                                    MessagePerformative.ACCEPT,
+                                    item,
+                                )
+                            )
+                        else:
+                            # The item is not acceptable, create a counter argument
+                            counter_argument = self.attack_argument(argument)
+                            self.send_message(
+                                Message(
+                                    self.get_name(),
+                                    message.get_exp(),
+                                    MessagePerformative.ARGUE,
+                                    (counter_argument.item, counter_argument),
+                                )
+                            )
+
+                    # The received argument is a counter argument against the item
+                    else:
+                        # The other agent doesnt want this item,
+                        # Check if another item is acceptable by this agent to propose it
+                        item_choices = filter(
+                            lambda item: item != argument.item, self.__item_list
                         )
-                    )
+                        item_choices = filter(
+                            lambda item: self.get_preference().is_item_among_top_10_percent(
+                                item, self.__item_list
+                            ),
+                            item_choices,
+                        )
+
+                        item_choices = list(item_choices)
+                        if len(item_choices) == 0:
+                            # If there are no valid items, CANCEL the argumentation
+                            self.send_message(
+                                Message(
+                                    self.get_name(),
+                                    message.get_exp(),
+                                    MessagePerformative.CANCEL,
+                                    "",
+                                )
+                            )
+                        else:
+                            new_item = random.choice(item_choices)
+                            self.send_message(
+                                Message(
+                                    self.get_name(),
+                                    message.get_exp(),
+                                    MessagePerformative.PROPOSE,
+                                    new_item,
+                                )
+                            )
 
                 case _:
                     print("Message not supported:", message)
@@ -154,20 +221,38 @@ class ArgumentAgent(CommunicatingAgent):
         argument.set_premiss_couple_value(premise.criterion_name, premise.value)
         return argument
 
-    def attack_argument(self, argument: Argument) -> Argument | None:
+    def attack_argument(self, argument: Argument) -> Argument:
         argument_criterion = argument.couple_value.criterion_name
         argument_value = argument.couple_value.value
         argument_item = argument.item
-        argument_boolean_decision = argument.boolean_decision
 
         value = self.get_preference().get_value(argument_item, argument_criterion)
 
-        if value == Value.BAD or value == Value.VERY_BAD:
-            argument = Argument(not argument_boolean_decision, argument_item)
-            argument.set_premiss_couple_value(argument_criterion, value)
-            return argument
+        # Only the top criterion is considered important
+        top_priority_criterion = self.get_preference().get_criterion_name_list()[0]
+        top_priority_criterion_value = self.get_preference().get_value(
+            argument_item, top_priority_criterion
+        )
 
-        pass
+        # If the criterion is important for him
+        if argument_criterion == top_priority_criterion:
+            # Check if the criterion value is bad
+            if value == Value.BAD or value == Value.VERY_BAD:
+                argument = Argument(False, argument_item)
+                argument.set_premiss_couple_value(argument_criterion, value)
+                return argument
+
+        # Check if the top criterion is bad
+        if (
+            top_priority_criterion_value == Value.VERY_BAD
+            or top_priority_criterion_value == Value.BAD
+        ):
+            argument = Argument(False, argument_item)
+            argument.set_premiss_couple_value(
+                top_priority_criterion, top_priority_criterion_value
+            )
+            argument.set_premiss_comparison(top_priority_criterion, argument_criterion)
+            return argument
 
 
 class ArgumentModel(Model):
@@ -180,18 +265,26 @@ class ArgumentModel(Model):
 
         (items, agents_data) = load_json(path)
 
-        for index, agent_data in enumerate(agents_data):
-            other_agent = None
-            if index == 0:
-                other_agent = random.choice(agents_data[1:])[0]
-            agent = ArgumentAgent(
+        start_index = random.randint(0, 1)
+
+        names = [agent_data[0] for agent_data in agents_data]
+        agent_to_propose = names[start_index]
+        agent_to_propose_to = names[1 - start_index]
+
+        agents = [
+            ArgumentAgent(
                 self.next_id(),
                 self,
-                agent_data[0],
+                names[index],
                 agent_data[1],
                 items.copy(),
-                other_agent,
+                agent_to_propose_to if names[index] == agent_to_propose else None,
             )
+            for index, agent_data in enumerate(agents_data)
+        ]
+
+        # Add to schedule
+        for agent in agents:
             self.schedule.add(agent)
 
         self.running = True
