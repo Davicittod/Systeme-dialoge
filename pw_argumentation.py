@@ -50,7 +50,6 @@ class ArgumentAgent(CommunicatingAgent):
                     self.__item_list,
                 )
             )
-            print(item_choices)
             self.send_message(
                 Message(
                     self.get_name(),
@@ -148,14 +147,24 @@ class ArgumentAgent(CommunicatingAgent):
                         else:
                             # The item is not acceptable, create a counter argument
                             counter_argument = self.attack_argument(argument)
-                            self.send_message(
-                                Message(
-                                    self.get_name(),
-                                    message.get_exp(),
-                                    MessagePerformative.ARGUE,
-                                    (counter_argument.item, counter_argument),
+                            if counter_argument is None:
+                                self.send_message(
+                                    Message(
+                                        self.get_name(),
+                                        message.get_exp(),
+                                        MessagePerformative.CANCEL,
+                                        "",
+                                    )
                                 )
-                            )
+                            else:
+                                self.send_message(
+                                    Message(
+                                        self.get_name(),
+                                        message.get_exp(),
+                                        MessagePerformative.ARGUE,
+                                        (counter_argument.item, counter_argument),
+                                    )
+                                )
 
                     # The received argument is a counter argument against the item
                     else:
@@ -221,7 +230,7 @@ class ArgumentAgent(CommunicatingAgent):
         argument.set_premiss_couple_value(premise.criterion_name, premise.value)
         return argument
 
-    def attack_argument(self, argument: Argument) -> Argument:
+    def attack_argument(self, argument: Argument) -> Argument | None:
         argument_criterion = argument.couple_value.criterion_name
         argument_value = argument.couple_value.value
         argument_item = argument.item
@@ -253,6 +262,8 @@ class ArgumentAgent(CommunicatingAgent):
             )
             argument.set_premiss_comparison(top_priority_criterion, argument_criterion)
             return argument
+
+        return None
 
 
 class ArgumentModel(Model):
